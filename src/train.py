@@ -69,10 +69,10 @@ class Train(object):
 		labels = labels.to(self.device)
 
 		logits = self.model(inputs)[0]
-		
-		idx = batch[] # index of separator token
-		#print('logits: {}'.format(logits.shape))
-		#print('idx: {}'.format(idx))
+				
+		idx = batch['s_idx'] # index of separator token
+		print('logits: {}'.format(logits.shape))
+		print('idx: {}'.format(idx))
 		# only consider loss on reference summary just like seq2seq models
 		shift_logits = logits[..., idx:-1, :].contiguous()
 		shift_labels = labels[..., idx+1:].contiguous()
@@ -87,7 +87,7 @@ class Train(object):
 	
 		with torch.no_grad():        
 			logits = self.model(inputs)[0]
-			#print('logits: {}'.format(logits.shape))
+			print('logits: {}'.format(logits.shape))
 			
 			idx = batch['s_idx'].item() 
 			shift_logits = logits[..., idx:-1, :].contiguous()
@@ -102,8 +102,8 @@ class Train(object):
 		total_train_loss = 0
 
 		for step, batch in enumerate(train_dataloader):
-			self.model.  # put all gradients to zero 
-			shift_logits, shift_labels =  # prepare batch data
+			self.model.zero_grad()  # put all gradients to zero 
+			shift_logits, shift_labels =self.process_train_batch(batch)  # prepare batch data
 
 			loss = self.loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
 			loss = loss/self.gradient_accumulation_steps
@@ -167,14 +167,14 @@ class Train(object):
 		for epoch_i in range(0, epochs):
 
 			print('======== Epoch {}/{} ========'.format(epoch_i + 1, epochs))
-			#print('Training...')
+			print('Training...')
 
 			total_train_loss = self.train_loop(train_dataloader)
 			avg_train_loss = self.average_loss(total_train_loss, len(train_dataloader))     
 			
 			print("  Average training loss: {0:.2f}".format(avg_train_loss))
 						
-			#print("Running Validation...")
+			print("Running Validation...")
 
 			total_eval_loss = self.eval_loop(val_dataloader)   
 			avg_val_loss = self.average_loss(total_eval_loss, len(val_dataloader)) 
