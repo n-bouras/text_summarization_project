@@ -15,7 +15,8 @@ from torchvision import transforms, utils
 class GPT2Dataset(Dataset):
   def __init__(self, df):
     self.encodings = df['encodings'].to_list()
-    self.sum_idx = df['text_len'].to_list()
+    self.sum_idx = df['text_len'].to_list() 
+    
   
   def __len__(self):
     return len(self.sum_idx)
@@ -37,8 +38,8 @@ def get_gpt2_dataset(train, val):
 
 def short_text(text, len):
 	text = text.split()
-	#print(len(text))
-	#len= len-1
+	print(len(text))
+	len= len-1
 	s_text = text[0:len]
 	s_text = ' '.join(s_text)
 	return  s_text
@@ -49,10 +50,10 @@ def process_dataframe(df, max_text, max_sum):
 	df['text'] = df['text'].apply(lambda x: short_text(x, max_text))
 	df['summary'] = df['summary'].apply(lambda x: short_text(x, max_sum))
 	df['text_len'] = df['text'].apply(lambda x: len(x.split()))
-	#print(df['summary'].str.split().str.len())
-	#df['summary'] = df['summary'].apply(lambda x: ' <CLS> ' + x) # do this step in data loader
-	#df['ts'] = df[['text', 'summary']].apply(lambda x: ''.join(x), axis=1)
-	#print(df['ts'].str.split().str.len())
+	print(df['summary'].str.split().str.len())
+	df['summary'] = df['summary'].apply(lambda x: ' <CLS> ' + x) # do this step in data loader
+	df['ts'] = df[['text', 'summary']].apply(lambda x: ''.join(x), axis=1)
+	print(df['ts'].str.split().str.len())
 
 	return df
 
